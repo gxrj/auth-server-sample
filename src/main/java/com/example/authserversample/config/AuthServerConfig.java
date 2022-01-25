@@ -4,21 +4,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.example.authserversample.auth.filters.UserFilter;
-import com.example.authserversample.auth.http.AuthEntryPoint;
-import com.example.authserversample.auth.http.HttpHandler;
 import com.example.authserversample.utils.KeyGenerator;
+
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -29,24 +23,20 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.oauth2.server.authorization.config.TokenSettings;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
+@Import( OAuth2AuthorizationServerConfiguration.class )
 @Configuration( proxyBeanMethods = false )
-
 public class AuthServerConfig {
 
-    @Autowired
+/*    @Autowired
     private HttpHandler httpHandler;
 
     @Autowired
     private AuthEntryPoint authEntryPoint;
 
-
     @Order( Ordered.HIGHEST_PRECEDENCE )
-    public SecurityFilterChain authServeFilterChain(HttpSecurity http )
-    throws Exception 
+    public SecurityFilterChain authServeFilterChain( final HttpSecurity http )
+    throws Exception
     {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity( http );
 
@@ -55,7 +45,9 @@ public class AuthServerConfig {
             authRequests -> authRequests.anyRequest().authenticated()
          )
         .csrf().disable()
-        .requestCache().disable()
+        .sessionManagement()
+            .sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+        .and()
         .exceptionHandling()
             .authenticationEntryPoint( authEntryPoint )
             .accessDeniedHandler( httpHandler )
@@ -67,11 +59,11 @@ public class AuthServerConfig {
         .logout()
             .logoutSuccessHandler( httpHandler )
         .and()
-        .addFilterAt( new UserFilter(), UsernamePasswordAuthenticationFilter.class );
-        
+        .addFilterBefore( new UserFilter(), UsernamePasswordAuthenticationFilter.class );
+
         return http.build();
-    }
-    
+    }*/
+
     @Bean
     public RegisteredClientRepository registeredClientRepository(){
 

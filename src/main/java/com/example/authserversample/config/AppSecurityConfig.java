@@ -8,10 +8,10 @@ import com.example.authserversample.auth.http.HttpHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,7 +32,7 @@ public class AppSecurityConfig {
     private AuthEntryPoint authEntryPoint;
 
     @Bean
-    SecurityFilterChain securityFilterChain( HttpSecurity http )
+    SecurityFilterChain securityFilterChain( final HttpSecurity http )
     throws Exception 
     {
         http
@@ -40,7 +40,9 @@ public class AppSecurityConfig {
             authRequests -> authRequests.anyRequest().authenticated()
         )
         .csrf().disable()
-        .requestCache().disable()
+        .sessionManagement()
+                .sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+        .and()
         .exceptionHandling()
                 .authenticationEntryPoint( authEntryPoint )
                 .accessDeniedHandler( httpHandler )
@@ -52,7 +54,7 @@ public class AppSecurityConfig {
         .logout()
                 .logoutSuccessHandler( httpHandler )
         .and()
-        .addFilterAt( new UserFilter(), UsernamePasswordAuthenticationFilter.class );
+        .addFilterBefore( new UserFilter(), UsernamePasswordAuthenticationFilter.class );
 
         return http.build();
     }
@@ -73,8 +75,4 @@ public class AppSecurityConfig {
     @Bean
     public PasswordEncoder encoder() { return new BCryptPasswordEncoder(); }
 
-    @Bean
-    public AuthenticationManager authenticationManager( AuthenticationManagerBuilder builder ){
-        return builder.getOrBuild();
-    }
 }
