@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.NullSecurityContextRepository;
 
 @EnableWebSecurity( debug = true )
 @Configuration
@@ -40,8 +41,12 @@ public class AppSecurityConfig {
             authRequests -> authRequests.anyRequest().authenticated()
         )
         .csrf().disable()
+        .requestCache().disable()
         .sessionManagement()
-                .sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+                .sessionCreationPolicy( SessionCreationPolicy.NEVER )
+        .and()
+        .securityContext()
+                .securityContextRepository( new NullSecurityContextRepository() )
         .and()
         .exceptionHandling()
                 .authenticationEntryPoint( authEntryPoint )

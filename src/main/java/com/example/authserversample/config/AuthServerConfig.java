@@ -4,6 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.example.authserversample.auth.filters.UserFilter;
+import com.example.authserversample.auth.http.AuthEntryPoint;
+import com.example.authserversample.auth.http.HttpHandler;
 import com.example.authserversample.utils.KeyGenerator;
 
 import com.nimbusds.jose.jwk.JWKSet;
@@ -35,7 +38,7 @@ public class AuthServerConfig {
     private AuthEntryPoint authEntryPoint;
 
     @Order( Ordered.HIGHEST_PRECEDENCE )
-    public SecurityFilterChain authServeFilterChain( final HttpSecurity http )
+    public SecurityFilterChain authServerFilterChain(final HttpSecurity http )
     throws Exception
     {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity( http );
@@ -45,8 +48,12 @@ public class AuthServerConfig {
             authRequests -> authRequests.anyRequest().authenticated()
          )
         .csrf().disable()
+        .requestCache().disable()
         .sessionManagement()
-            .sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+            .sessionCreationPolicy( SessionCreationPolicy.NEVER )
+        .and()
+        .securityContext()
+                .securityContextRepository( new NullSecurityContextRepository() )
         .and()
         .exceptionHandling()
             .authenticationEntryPoint( authEntryPoint )
