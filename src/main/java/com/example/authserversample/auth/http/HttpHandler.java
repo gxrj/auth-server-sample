@@ -72,11 +72,15 @@ public class HttpHandler
     public static void setResponse( HttpServletResponse resp, int status, String json )
             throws IOException, ServletException {
 
-        resp.setContentType( "application/json" );
-        resp.setCharacterEncoding( "utf-8" );
+        setJsonType( resp );
 
         resp.getWriter().print( json );
         resp.setStatus( status );
+    }
+
+    public static void setJsonType( HttpServletResponse resp ){
+        resp.setContentType( "application/json" );
+        resp.setCharacterEncoding( "utf-8" );
     }
 
     public static JsonNode parseIntoJsonNode( HttpServletRequest req ) throws IOException {

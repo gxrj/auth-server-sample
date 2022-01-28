@@ -2,13 +2,10 @@ package com.example.authserversample.config;
 
 import java.util.List;
 
-import com.example.authserversample.auth.filters.UserFilter;
-import com.example.authserversample.auth.http.AuthEntryPoint;
-import com.example.authserversample.auth.http.HttpHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,47 +16,45 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.NullSecurityContextRepository;
 
 @EnableWebSecurity( debug = true )
 @Configuration
 public class AppSecurityConfig {
 
-    @Autowired
-    private HttpHandler httpHandler;
-
-    @Autowired
-    private AuthEntryPoint authEntryPoint;
-
     @Bean
-    SecurityFilterChain securityFilterChain( final HttpSecurity http )
+    @Order( 1 )
+    SecurityFilterChain userSecurityFilterChain( final HttpSecurity http )
     throws Exception 
     {
         http
         .authorizeHttpRequests(
-            authRequests -> authRequests.anyRequest().authenticated()
+            authRequests -> authRequests.mvcMatchers( "/login" ).permitAll()
+                                .anyRequest().authenticated()
         )
-        .csrf().disable()
-        .requestCache().disable()
+        .cors().disable()
         .sessionManagement()
                 .sessionCreationPolicy( SessionCreationPolicy.NEVER )
         .and()
-        .securityContext()
-                .securityContextRepository( new NullSecurityContextRepository() )
-        .and()
-        .exceptionHandling()
-                .authenticationEntryPoint( authEntryPoint )
-                .accessDeniedHandler( httpHandler )
-        .and()
-        .formLogin()
-                .successHandler( httpHandler )
-                .failureHandler( httpHandler )
-        .and()
-        .logout()
-                .logoutSuccessHandler( httpHandler )
-        .and()
-        .addFilterBefore( new UserFilter(), UsernamePasswordAuthenticationFilter.class );
+        .formLogin().loginPage( "/login" );
+
+        return http.build();
+    }
+
+    @Bean
+    @Order( 2 )
+    SecurityFilterChain agentSecurityFilterChain( final HttpSecurity http )
+            throws Exception
+    {
+        http
+                .authorizeHttpRequests(
+                        authRequests -> authRequests.mvcMatchers( "/agent/login" ).permitAll()
+                                .anyRequest().authenticated()
+                )
+                .cors().disable()
+                .sessionManagement()
+                .sessionCreationPolicy( SessionCreationPolicy.NEVER )
+                .and()
+                .formLogin().loginPage( "/login-agent" );
 
         return http.build();
     }
