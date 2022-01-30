@@ -6,3 +6,6 @@ debug: true
 logging:
   level:
     root: DEBUG
+    org:
+      springframework:
+        security: trace
