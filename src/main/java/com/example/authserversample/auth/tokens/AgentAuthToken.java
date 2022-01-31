@@ -13,7 +13,7 @@ public class AgentAuthToken extends UsernamePasswordAuthenticationToken {
     }
 
     public AgentAuthToken( String principal, AgentCredentials credentials,
-                           Collection< GrantedAuthority > authorities ){
+                           Collection< ? extends GrantedAuthority > authorities ){
         super( principal, credentials, authorities );
     }
 }

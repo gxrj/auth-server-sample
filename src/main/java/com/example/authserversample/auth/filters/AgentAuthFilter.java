@@ -31,7 +31,7 @@ public class AgentAuthFilter extends AbstractAuthenticationProcessingFilter {
 
         AgentCredentials credentials = new AgentCredentials( cpf, password );
         var token = new AgentAuthToken( username, credentials );
-
+        
         return getAuthenticationManager().authenticate( token );
     }
 }

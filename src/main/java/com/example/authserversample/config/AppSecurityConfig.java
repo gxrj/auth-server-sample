@@ -1,6 +1,8 @@
 package com.example.authserversample.config;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.authserversample.auth.filters.AgentAuthFilter;
 import com.example.authserversample.auth.filters.UserAuthFilter;
@@ -18,8 +20,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -30,11 +35,11 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 public class AppSecurityConfig {
 
-    //@formatter:off
+    // @formatter:off
     @Bean
     SecurityFilterChain securityFilterChain( HttpSecurity http )
-    throws Exception
-    {
+    throws Exception {
+
         http.authorizeHttpRequests(
             authRequests -> authRequests
                                 .mvcMatchers( "/login", "/agent/login", "/css/**", "/img/**" )
@@ -72,6 +77,10 @@ public class AppSecurityConfig {
 
         return http.build();
     }
+    // @formatter:on
+    private RequestMatcher requestMatcher( String pattern, String httpMethod ){
+        return new AntPathRequestMatcher( pattern, httpMethod );
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(){
@@ -99,9 +108,15 @@ public class AppSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder encoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder encoder() {
 
-    private RequestMatcher requestMatcher( String pattern, String httpMethod ){
-        return new AntPathRequestMatcher( pattern, httpMethod );
+        var defaultEncoder = "argon2";
+
+        Map<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put( "bcrypt", new BCryptPasswordEncoder() );
+        encoders.put( "scrypt", new SCryptPasswordEncoder() );
+        encoders.put( "argon2", new Argon2PasswordEncoder() );
+
+        return new DelegatingPasswordEncoder( defaultEncoder, encoders );
     }
 }

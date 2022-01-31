@@ -12,7 +12,7 @@ public class UserAuthToken extends UsernamePasswordAuthenticationToken {
     }
 
     public UserAuthToken( String principal, String credentials,
-                          Collection< GrantedAuthority > authorities ){
+                          Collection< ? extends GrantedAuthority > authorities ){
         super( principal, credentials, authorities );
     }
 }
