@@ -17,7 +17,9 @@ public class RequestHandler {
     public static String obtainParam( HttpServletRequest req, String param )
             throws IOException {
 
-        if( RequestHandler.isJsonContent( req ) ) {
+        var isHttpPost = req.getMethod().equalsIgnoreCase( "POST" );
+
+        if( isHttpPost && RequestHandler.isJsonContent( req ) ) {
 
             var json = RequestHandler.parseIntoJson( req );
             Assert.notNull( json, "error while parsing into json" );

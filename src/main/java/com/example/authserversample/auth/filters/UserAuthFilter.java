@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.ServletException;
@@ -19,26 +20,21 @@ import java.io.IOException;
 
 public class UserAuthFilter extends AbstractAuthenticationProcessingFilter {
 
-    private final Log log = LogFactory.getLog( getClass() );
-
     public UserAuthFilter( RequestMatcher matcher, AuthenticationManager authManager  ){
         super( matcher, authManager );
+        setAuthenticationFailureHandler( this::unsuccessfulAuthentication );
 
-        setAuthenticationFailureHandler(
-                ( req, resp, authEx ) -> ResponseHandler
-                                            .prepareJsonResponse( resp, 400, "Bad request" ) );
+        /*setRequiresAuthenticationRequestMatcher( new AntPathRequestMatcher( "/login", "POST" ) );*/
     }
 
     @Override
     public Authentication attemptAuthentication( HttpServletRequest request, HttpServletResponse response )
     throws AuthenticationException, IOException, ServletException {
-        log.debug( "Attempting authentication from:" + getClass().getName() );
+
         var username = RequestHandler.obtainParam( request, "username" );
         var password = RequestHandler.obtainParam( request, "password" );
 
         var token = new UserAuthToken( username, password );
-
-        log.debug( "Authentication extracted id: "+username );
 
         return getAuthenticationManager().authenticate( token );
     }

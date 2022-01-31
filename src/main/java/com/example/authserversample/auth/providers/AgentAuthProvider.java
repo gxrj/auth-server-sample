@@ -2,6 +2,9 @@ package com.example.authserversample.auth.providers;
 
 import com.example.authserversample.auth.models.AgentCredentials;
 import com.example.authserversample.auth.tokens.AgentAuthToken;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,6 +13,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Setter
+
+@NoArgsConstructor
+@AllArgsConstructor
 public class AgentAuthProvider implements AuthenticationProvider {
 
     @Autowired
@@ -41,6 +48,6 @@ public class AgentAuthProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports( Class< ? > authToken ) {
-        return authToken.isInstance( AgentAuthToken.class );
+        return authToken.equals( AgentAuthToken.class );
     }
 }

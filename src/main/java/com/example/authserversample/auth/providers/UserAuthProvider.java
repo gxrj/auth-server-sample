@@ -1,7 +1,11 @@
 package com.example.authserversample.auth.providers;
 
 import com.example.authserversample.auth.tokens.UserAuthToken;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -9,12 +13,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Setter
+
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserAuthProvider implements AuthenticationProvider {
 
-    @Autowired
-    private UserDetailsService userService;
+    private final Log log = LogFactory.getLog( getClass() );
 
-    @Autowired
+    private UserDetailsService userService;
     private PasswordEncoder encoder;
 
     @Override
@@ -41,6 +48,6 @@ public class UserAuthProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports( Class< ? > authToken ) {
-        return authToken.isInstance( UserAuthToken.class );
+        return authToken.equals( UserAuthToken.class );
     }
 }

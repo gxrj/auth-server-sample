@@ -20,10 +20,7 @@ public class AgentAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     public AgentAuthFilter( RequestMatcher matcher, AuthenticationManager authManager ) {
         super( matcher, authManager );
-
-        setAuthenticationFailureHandler(
-                ( req, resp, authEx ) -> ResponseHandler
-                        .prepareJsonResponse( resp, 400, "Bad request" ) );
+        setAuthenticationFailureHandler( this::unsuccessfulAuthentication );
     }
 
     @Override

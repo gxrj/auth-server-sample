@@ -12,7 +12,7 @@ public class ResponseHandler {
         resp.setContentType( "application/json" );
         resp.setCharacterEncoding( "utf-8" );
 
-        resp.getWriter().print( "{ \"message\": \" "+ message +" \" }" );
+       resp.getWriter().print( "{ \"message\": \" "+ message +" \" }" );
         resp.setStatus( httpStatus );
     }
 }
