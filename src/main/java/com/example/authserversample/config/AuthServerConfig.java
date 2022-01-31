@@ -9,6 +9,7 @@ import com.example.authserversample.utils.KeyGenerator;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -28,6 +29,9 @@ import org.springframework.security.oauth2.server.authorization.config.TokenSett
 @Configuration( proxyBeanMethods = false )
 public class AuthServerConfig {
 
+    @Value( "${address}" )
+    private String address;
+
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
 
@@ -37,7 +41,7 @@ public class AuthServerConfig {
                                 .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_BASIC )
                                 .authorizationGrantType( AuthorizationGrantType.AUTHORIZATION_CODE )
                                 .authorizationGrantType( AuthorizationGrantType.REFRESH_TOKEN )
-                                .redirectUri( "http://localhost:8080/login" )
+                                .redirectUri( String.format( "%s/login", address ) )
                                 .scope( "test" )
                                 .clientIdIssuedAt( Instant.now() )
                                 .clientSettings(
@@ -72,6 +76,6 @@ public class AuthServerConfig {
 
     @Bean
     public ProviderSettings providerSettings(){
-        return ProviderSettings.builder().issuer( "http://localhost:8080" ).build();
+        return ProviderSettings.builder().issuer( address ).build();
     }
 }

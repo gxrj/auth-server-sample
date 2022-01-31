@@ -9,3 +9,5 @@ logging:
     org:
       springframework:
         security: trace
+
+address: https://fiscaliza-auth-server.herokuapp.com/
