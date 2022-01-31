@@ -25,11 +25,9 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -86,18 +84,18 @@ public class AppSecurityConfig {
     }
     
     // @formatter:on
-    private RequestMatcher requestMatcher( String pattern, String httpMethod ){
+    private RequestMatcher requestMatcher( String pattern, String httpMethod ) {
         return new AntPathRequestMatcher( pattern, httpMethod );
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(){
+    public AuthenticationManager authenticationManager() {
         return new ProviderManager( new AgentAuthProvider( userDetailsService(), encoder() ),
                                     new UserAuthProvider( userDetailsService(), encoder() ) );
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
 
         UserDetails user = User.builder()
                 .authorities( List.of() )
