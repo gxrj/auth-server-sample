@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -64,15 +64,17 @@ public class AppSecurityConfig {
                 );
 
         http
-        .addFilter( /* Filtragem de usuários */
+        .addFilterBefore( /* Filtragem de funionários públicos */
                 new AgentAuthFilter( requestMatcher( "/agent/login", "POST" ),
                                      authenticationManager()
-                )
+                ),
+                AnonymousAuthenticationFilter.class
         )
-        .addFilter( /* Filtragem de funionários públicos */
+        .addFilterAfter( /* Filtragem de usuários */
                 new UserAuthFilter( requestMatcher( "/login", "POST" ),
                                     authenticationManager()
-                )
+                ),
+                AgentAuthFilter.class
         );
 
         return http.build();
