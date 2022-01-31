@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -38,7 +40,7 @@ public class AuthServerConfig {
         RegisteredClient client = RegisteredClient.withId( UUID.randomUUID().toString() )
                                 .clientId( "client" )
                                 .clientSecret( AppSecurityConfig.encoder().encode( "123" ) )
-                                .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_BASIC )
+                                .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_POST )
                                 .authorizationGrantType( AuthorizationGrantType.AUTHORIZATION_CODE )
                                 .authorizationGrantType( AuthorizationGrantType.REFRESH_TOKEN )
                                 .redirectUri( String.format( "%s/login", address ) )
@@ -54,6 +56,7 @@ public class AuthServerConfig {
                                         TokenSettings.builder()
                                                 .accessTokenTimeToLive( Duration.ofMinutes( 15 ) )
                                                 .refreshTokenTimeToLive( Duration.ofMinutes( 15 ) )
+                                                .idTokenSignatureAlgorithm( SignatureAlgorithm.ES256 )
                                                 .build()
                                 )
                                 .clientName( "angular" )
