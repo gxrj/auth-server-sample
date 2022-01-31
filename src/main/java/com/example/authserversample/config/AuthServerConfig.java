@@ -9,14 +9,10 @@ import com.example.authserversample.utils.KeyGenerator;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -32,19 +28,16 @@ import org.springframework.security.oauth2.server.authorization.config.TokenSett
 @Configuration( proxyBeanMethods = false )
 public class AuthServerConfig {
 
-    @Autowired
-    private PasswordEncoder encoder;
-
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
 
         RegisteredClient client = RegisteredClient.withId( UUID.randomUUID().toString() )
                                 .clientId( "client" )
-                                .clientSecret( encoder.encode( "123" ) )
+                                .clientSecret( AppSecurityConfig.encoder().encode( "123" ) )
                                 .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_BASIC )
                                 .authorizationGrantType( AuthorizationGrantType.AUTHORIZATION_CODE )
                                 .authorizationGrantType( AuthorizationGrantType.REFRESH_TOKEN )
-                                .redirectUri( "http://auth-server:8080/login" )
+                                .redirectUri( "http://localhost:8080/login" )
                                 .scope( "test" )
                                 .clientIdIssuedAt( Instant.now() )
                                 .clientSettings(
@@ -79,6 +72,6 @@ public class AuthServerConfig {
 
     @Bean
     public ProviderSettings providerSettings(){
-        return ProviderSettings.builder().issuer( "http://auth-server:8080" ).build();
+        return ProviderSettings.builder().issuer( "http://localhost:8080" ).build();
     }
 }

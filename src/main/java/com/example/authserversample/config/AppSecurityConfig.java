@@ -115,7 +115,7 @@ public class AppSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder encoder() {
+    public static PasswordEncoder encoder() {
 
         var defaultEncoder = "argon2";
 

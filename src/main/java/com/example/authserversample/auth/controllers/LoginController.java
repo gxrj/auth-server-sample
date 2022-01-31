@@ -20,7 +20,7 @@ import java.io.IOException;
         produces = MediaType.ALL_VALUE )
 public class LoginController {
 
-    @GetMapping( path = "/login" )
+    @RequestMapping( path = "/login" )
     public String getForm(){
         return "login";
     }
