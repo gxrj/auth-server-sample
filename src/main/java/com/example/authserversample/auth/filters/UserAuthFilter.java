@@ -2,6 +2,7 @@ package com.example.authserversample.auth.filters;
 
 import com.example.authserversample.auth.tokens.UserAuthToken;
 import com.example.authserversample.utils.RequestHandler;
+import com.example.authserversample.utils.ResponseHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,10 @@ public class UserAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     public UserAuthFilter( RequestMatcher matcher, AuthenticationManager authManager  ){
         super( matcher, authManager );
+
+        setAuthenticationFailureHandler(
+                ( req, resp, authEx ) -> ResponseHandler
+                                            .prepareJsonResponse( resp, 400, "Bad request" ) );
     }
 
     @Override

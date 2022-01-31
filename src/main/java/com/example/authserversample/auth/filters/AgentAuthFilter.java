@@ -3,6 +3,7 @@ package com.example.authserversample.auth.filters;
 import com.example.authserversample.auth.models.AgentCredentials;
 import com.example.authserversample.auth.tokens.AgentAuthToken;
 import com.example.authserversample.utils.RequestHandler;
+import com.example.authserversample.utils.ResponseHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,10 @@ public class AgentAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     public AgentAuthFilter( RequestMatcher matcher, AuthenticationManager authManager ) {
         super( matcher, authManager );
+
+        setAuthenticationFailureHandler(
+                ( req, resp, authEx ) -> ResponseHandler
+                        .prepareJsonResponse( resp, 400, "Bad request" ) );
     }
 
     @Override
