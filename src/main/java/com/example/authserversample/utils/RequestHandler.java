@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
 
 public class RequestHandler {
 

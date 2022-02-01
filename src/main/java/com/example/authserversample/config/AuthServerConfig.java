@@ -1,11 +1,13 @@
 package com.example.authserversample.config;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 import com.example.authserversample.utils.KeyGenerator;
-
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -16,7 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
@@ -56,7 +57,7 @@ public class AuthServerConfig {
                                         TokenSettings.builder()
                                                 .accessTokenTimeToLive( Duration.ofMinutes( 15 ) )
                                                 .refreshTokenTimeToLive( Duration.ofMinutes( 15 ) )
-                                                .idTokenSignatureAlgorithm( SignatureAlgorithm.ES256 )
+                                                .idTokenSignatureAlgorithm( SignatureAlgorithm.RS256 )
                                                 .build()
                                 )
                                 .clientName( "angular" )
@@ -71,10 +72,10 @@ public class AuthServerConfig {
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource(){
-
-        JWKSet keySet = new JWKSet( KeyGenerator.getECKeys() );
-        return ( jwkSelector, context ) -> jwkSelector.select( keySet );
+    public JWKSource<SecurityContext> jwkSource() 
+    throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
+        JWKSet keySet = new JWKSet( KeyGenerator.getRsaKey() );
+        return ( jwkSelector, context ) -> jwkSelector.select( keySet ); 
     }
 
     @Bean
