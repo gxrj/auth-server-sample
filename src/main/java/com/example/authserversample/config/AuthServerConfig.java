@@ -4,6 +4,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 import com.example.authserversample.utils.KeyGenerator;
@@ -20,6 +22,8 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -38,13 +42,16 @@ public class AuthServerConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
 
+        var userLoginPageUrl = address + "/login";
+        var agentLoginPageUrl = address + "/agent/login" ;
+
         RegisteredClient client = RegisteredClient.withId( UUID.randomUUID().toString() )
                                 .clientId( "client" )
                                 .clientSecret( AppSecurityConfig.encoder().encode( "123" ) )
                                 .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_POST )
                                 .authorizationGrantType( AuthorizationGrantType.AUTHORIZATION_CODE )
                                 .authorizationGrantType( AuthorizationGrantType.REFRESH_TOKEN )
-                                .redirectUri( String.format( "%s/login", address ) )
+                                .redirectUris( setConsumer -> setConsumer.addAll( Set.of( userLoginPageUrl, agentLoginPageUrl ) ) )
                                 .scope( "test" )
                                 .clientIdIssuedAt( Instant.now() )
                                 .clientSettings(
@@ -57,7 +64,7 @@ public class AuthServerConfig {
                                         TokenSettings.builder()
                                                 .accessTokenTimeToLive( Duration.ofMinutes( 15 ) )
                                                 .refreshTokenTimeToLive( Duration.ofMinutes( 15 ) )
-                                                .idTokenSignatureAlgorithm( SignatureAlgorithm.RS256 )
+                                                .idTokenSignatureAlgorithm( SignatureAlgorithm.ES256 )
                                                 .build()
                                 )
                                 .clientName( "angular" )
@@ -71,11 +78,18 @@ public class AuthServerConfig {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder( jwkSource );
     }
 
+    /* Implementation of JWKSource */
     @Bean
     public JWKSource<SecurityContext> jwkSource() 
     throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
-        JWKSet keySet = new JWKSet( KeyGenerator.getRsaKey() );
+        JWKSet keySet = new JWKSet( KeyGenerator.getECKeys() );
         return ( jwkSelector, context ) -> jwkSelector.select( keySet ); 
+    }
+
+    /* Implementation of token customizer to set "alg" header to ES256 */
+    @Bean
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+        return context -> context.getHeaders().algorithm( SignatureAlgorithm.ES256 );
     }
 
     @Bean
