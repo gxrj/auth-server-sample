@@ -4,7 +4,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +13,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,16 +75,19 @@ public class AuthServerConfig {
     }
 
     @Bean
-    public JwtDecoder JwtDecoder() throws
-            NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
-
-        var keys = List.of( KeyGenerator.getEcJwk(), KeyGenerator.getRsaJwk() );
-        JWKSet keySet = new JWKSet( keys );
-
-        // Implementation of JWKSource
-        JWKSource<SecurityContext> jwkSource = ( jwkSelector, context ) -> jwkSelector.select( keySet );
-
+    public JwtDecoder JwtDecoder( JWKSource<SecurityContext> jwkSource ) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder( jwkSource );
+    }
+
+    /* Implementation of JWKSource */
+    @Bean
+    public JWKSource<SecurityContext> jwkSource()
+            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
+
+        var signatureKeys = List.of( KeyGenerator.getEcJwk(), KeyGenerator.getRsaJwk() );
+        JWKSet keySet = new JWKSet( signatureKeys );
+
+        return ( jwkSelector, context ) -> jwkSelector.select( keySet );
     }
 
     /* Implementation of token customizer to set "alg" header to ES256 */
