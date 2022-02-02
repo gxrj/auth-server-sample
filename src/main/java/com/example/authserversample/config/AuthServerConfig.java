@@ -81,8 +81,8 @@ public class AuthServerConfig {
 
     /* Implementation of JWKSource */
     @Bean
-    public JWKSource<SecurityContext> jwkSource()
-            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
+    public JWKSource<SecurityContext> jwkSource() throws
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException, JOSEException {
 
         var signatureKeys = List.of( KeyGenerator.getEcJwk(), KeyGenerator.getRsaJwk() );
         JWKSet keySet = new JWKSet( signatureKeys );
