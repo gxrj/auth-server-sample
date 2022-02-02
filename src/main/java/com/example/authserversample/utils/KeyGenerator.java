@@ -52,7 +52,7 @@ public class KeyGenerator {
         }
     }
 
-    public static RSAKey getRsaKey() throws JOSEException {
+    public static RSAKey getRsaKeys() throws JOSEException {
 
         var operations = setKeyOperations( KeyOperation.SIGN, KeyOperation.VERIFY );
 
@@ -81,8 +81,8 @@ public class KeyGenerator {
         return operationsSet;
     }
 
-    public static JWK getEcJwk() 
-    throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JWK getEcJwk() throws
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
         KeyPairGenerator gen = KeyPairGenerator.getInstance( "EC" );
         gen.initialize( Curve.P_256.toECParameterSpec() );
@@ -93,8 +93,8 @@ public class KeyGenerator {
                         .build();
     }
 
-    public static JWK getRsaJwk() 
-    throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JWK getRsaJwk() throws
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
         KeyPairGenerator gen = KeyPairGenerator.getInstance( "RSA" );
         gen.initialize( 2048 );
