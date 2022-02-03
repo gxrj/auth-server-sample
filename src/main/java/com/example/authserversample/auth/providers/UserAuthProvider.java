@@ -2,8 +2,6 @@ package com.example.authserversample.auth.providers;
 
 import com.example.authserversample.auth.tokens.UserAuthToken;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -11,9 +9,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Setter
-
-@NoArgsConstructor
 @AllArgsConstructor
 public class UserAuthProvider implements AuthenticationProvider {
 
