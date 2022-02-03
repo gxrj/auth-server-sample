@@ -37,9 +37,9 @@ public class RequestHandler {
         Assert.isTrue( isJsonContent( req ), "content-type cannot be handled as json" );
 
         var requestBody = cacheRequest( req ).getReader();
-        var ObjectMapper = Jackson2ObjectMapperBuilder.json().build();
+        var objMapper = Jackson2ObjectMapperBuilder.json().build();
 
-        return  ObjectMapper.readTree( requestBody );
+        return  objMapper.readTree( requestBody );
     }
 
     public static boolean isJsonContent( HttpServletRequest req ){
