@@ -17,9 +17,9 @@ public class RequestHandler {
 
         var isHttpPost = req.getMethod().equalsIgnoreCase( "POST" );
 
-        if( isHttpPost && RequestHandler.isJsonContent( req ) ) {
+        if( isHttpPost && isJsonContent( req ) ) {
 
-            var json = RequestHandler.parseIntoJson( req );
+            var json = parseIntoJson( req );
             Assert.notNull( json, "error while parsing into json" );
 
             var result = json.get( param ).asText();
