@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.example.authserversample.utils.KeyGenerator;
+import com.example.authserversample.utils.RequestHandler;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -17,8 +18,11 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
@@ -31,14 +35,52 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.oauth2.server.authorization.config.TokenSettings;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
-
-@Import( OAuth2AuthorizationServerConfiguration.class )
 @Configuration( proxyBeanMethods = false )
 public class AuthServerConfig {
 
     @Value( "${address}" )
     private String address;
+
+    @Bean
+    @Order( Ordered.HIGHEST_PRECEDENCE )
+    public SecurityFilterChain securityFilterChain( HttpSecurity http ) throws Exception {
+        OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
+                new OAuth2AuthorizationServerConfigurer<>();
+        RequestMatcher endpointsMatcher = authorizationServerConfigurer
+                .getEndpointsMatcher();
+
+        http
+            .requestMatcher( endpointsMatcher )
+            .authorizeRequests(
+                    authorizeRequests -> authorizeRequests.anyRequest().authenticated()
+            )
+            .csrf( csrf -> csrf.ignoringRequestMatchers( endpointsMatcher ) )
+            .exceptionHandling(
+                    exceptionCustomizer ->
+                            exceptionCustomizer
+                                .authenticationEntryPoint(
+                                    /**
+                                     * Responsable to handle which form login
+                                     * will be shown according to user type
+                                     * when hit /oauth2/authorized unnauthenticated
+                                     */
+                                    ( request, response, authException ) -> {
+                                        var userType = RequestHandler.obtainParam( request, "user_type" );
+
+                                        if( userType.equalsIgnoreCase( "agent" ) )
+                                            response.sendRedirect( "/agent/login" );
+                                        else
+                                            response.sendRedirect( "/login" );
+                                    }
+                                )
+            )
+            .apply( authorizationServerConfigurer );
+
+        return http.build();
+    }
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {

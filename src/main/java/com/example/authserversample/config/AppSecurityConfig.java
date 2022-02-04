@@ -35,7 +35,7 @@ public class AppSecurityConfig {
 
     // @formatter:off
     @Bean
-    SecurityFilterChain securityFilterChain( HttpSecurity http )
+    SecurityFilterChain appSecurityFilterChain( HttpSecurity http )
     throws Exception {
 
         http.authorizeHttpRequests(
