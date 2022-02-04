@@ -10,4 +10,4 @@ logging:
       springframework:
         security: trace
 
-address:  http://auth-server:8080  #https://fiscaliza-auth-server.herokuapp.com/
+address:  https://fiscaliza-auth-server.herokuapp.com/ #http://auth-server:8080
