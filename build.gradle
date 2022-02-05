@@ -41,3 +41,16 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+
+// Heroku build setting bellow
+
+task stage( dependsOn: [ 'build', 'clean' ] )
+build.mustRunAfter clean
+
+task copyToLib( type: Copy ) {
+    into "$buildDir/libs"
+    from( configurations.compile )
+}
+
+stage.dependsOn( copyToLib )
