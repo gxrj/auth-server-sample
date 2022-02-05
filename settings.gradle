@@ -1,1 +1,3 @@
-rootProject.name = 'auth-server-sample'
+rootProject.name='auth-server-sample'
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
