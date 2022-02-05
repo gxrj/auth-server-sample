@@ -1,1 +1,1 @@
--Dserver.port=$PORT
+java -Dserver.port=$PORT
