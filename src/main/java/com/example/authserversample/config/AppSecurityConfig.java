@@ -17,7 +17,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.core.userdetails.User;
@@ -55,10 +54,11 @@ public class AppSecurityConfig {
                                 .anyRequest().authenticated()
         );
 
-        http.cors().disable()
-        .csrf( Customizer.withDefaults() )
+        http
+        .cors().disable()
+        .csrf().disable()
         .sessionManagement()
-                .sessionCreationPolicy( SessionCreationPolicy.NEVER );
+            .sessionCreationPolicy( SessionCreationPolicy.NEVER );
 
         http
         .exceptionHandling()
