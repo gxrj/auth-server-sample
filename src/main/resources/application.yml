@@ -1,3 +1,6 @@
+server:
+    port: $PORT # For heroku app works
+  
 debug: true
 
 logging:
