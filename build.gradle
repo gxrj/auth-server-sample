@@ -41,16 +41,3 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-
-// Heroku build setting bellow
-
-task stage( dependsOn: [ 'build', 'clean' ] )
-build.mustRunAfter clean
-
-gradle.taskGraph.whenReady {
-  taskGraph ->
-    if (taskGraph.hasTask(stage)) {
-      test.enabled = false
-    }
-}
