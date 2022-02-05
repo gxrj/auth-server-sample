@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Heroku builds ###
+build
+.gradle
+.idea
+out
+*.iml
+*.ipr
+*.iws
+.DS_Store
