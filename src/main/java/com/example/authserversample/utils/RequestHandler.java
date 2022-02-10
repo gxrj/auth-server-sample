@@ -38,7 +38,8 @@ public class RequestHandler {
         
         var contentType = req.getContentType();
 
-        if( contentType == null ) { contentType = "application/octet-stream"; }
+        if( contentType == null )
+            contentType = "application/octet-stream";
 
         return contentType.toLowerCase();
     }
