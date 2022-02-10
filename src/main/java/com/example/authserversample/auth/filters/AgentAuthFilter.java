@@ -28,17 +28,17 @@ public class AgentAuthFilter extends AbstractAuthenticationProcessingFilter {
         
         String cpf, username, password;
 
-        if( RequestHandler.isJsonContent( req ) ){
-            var json = RequestHandler.parseToJson( req );
+        if( RequestHandler.isJsonContent( request ) ){
+            var json = RequestHandler.parseToJson( request );
 
             cpf = json.get( "cpf" ).asText();
             username = json.get( "username" ).asText();
             password = json.get( "password" ).asText();
         }
         else {
-            cpf = req.getParameter( "cpf" );
-            username = req.getParameter( "username" );
-            password = req.getParameter( "password" );
+            cpf = request.getParameter( "cpf" );
+            username = request.getParameter( "username" );
+            password = request.getParameter( "password" );
         }
 
         AgentCredentials credentials = new AgentCredentials( cpf, password );
