@@ -12,25 +12,6 @@ import java.io.IOException;
 
 public class RequestHandler {
 
-    public static String obtainParam( HttpServletRequest req, String param )
-            throws IOException {
-
-        var isHttpPost = req.getMethod().equalsIgnoreCase( "POST" );
-
-        if( isHttpPost && isJsonContent( req ) ) {
-
-            var json = parseIntoJson( req );
-            Assert.notNull( json, "error while parsing into json" );
-
-            var result = json.get( param ).asText();
-            Assert.notNull( result, "param name not found" );
-
-            return result;
-        }
-
-        return req.getParameter( param );
-    }
-
     public static JsonNode parseIntoJson( HttpServletRequest req )
             throws IOException {
 
@@ -54,7 +35,11 @@ public class RequestHandler {
     }
 
     private static HttpServletRequestWrapper cacheRequest( HttpServletRequest req ) {
-        Assert.notNull( req, "cacheRequest() cannot handle null objects" );
-        return new HttpServletRequestWrapper( req );
+        
+        var contentType = req.getContentType();
+
+        if( contentType == null ) { contentType = "application/octet-stream"; }
+
+        return contentType.toLowerCase();
     }
 }
