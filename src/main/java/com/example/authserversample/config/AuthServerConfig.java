@@ -61,6 +61,14 @@ public class AuthServerConfig {
             .exceptionHandling(
                     exceptionCustomizer ->
                             exceptionCustomizer
+                                .accessDeniedHandler(
+                                    /**
+                                     * Responsable, mainly, to handle
+                                     * hits to wrong endpoints
+                                     */
+                                    ( request, response, accessDeniedEx ) -> 
+                                                    response.sendError( 404, accessDeniedEx.getMessage() ) 
+                                )
                                 .authenticationEntryPoint(
                                     /**
                                      * Responsable to handle which form login
