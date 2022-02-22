@@ -12,6 +12,7 @@ import com.example.authserversample.auth.providers.UserAuthProvider;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ProviderManager;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,6 +36,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -49,7 +53,7 @@ public class AppSecurityConfig {
 
         http.authorizeHttpRequests(
             authRequests -> authRequests
-                                .mvcMatchers( "/login", "/agent/login", "/css/**", "/img/**" )
+                                .mvcMatchers( "/login", "/agent/login", "/unauthorized", "/error", "/css/**", "/img/**" )
                                 .permitAll()
                                 .anyRequest().authenticated()
         );
@@ -73,15 +77,11 @@ public class AppSecurityConfig {
 
         http
         .addFilterBefore( /* Filtragem de funionários públicos */
-                new AgentAuthFilter( requestMatcher( "/agent/login", "POST" ),
-                                     authenticationManager()
-                ),
+                agentAuthFilter( "/agent/login", "POST" ),
                 AnonymousAuthenticationFilter.class
         )
         .addFilterAfter( /* Filtragem de usuários */
-                new UserAuthFilter( requestMatcher( "/login", "POST" ),
-                                    authenticationManager()
-                ),
+                userAuthFilter( "/login", "POST" ),
                 AgentAuthFilter.class
         );
 
@@ -133,5 +133,33 @@ public class AppSecurityConfig {
         encoders.put( "argon2", new Argon2PasswordEncoder() );
 
         return new DelegatingPasswordEncoder( defaultEncoder, encoders );
+    }
+    
+    private AgentAuthFilter agentAuthFilter( String url, String httpMethod ) {
+        var matcher = requestMatcher( url, httpMethod );
+        var agentFilter = new AgentAuthFilter( matcher, authenticationManager() );
+        agentFilter.setAuthenticationFailureHandler( authFailHandler() );
+
+        return agentFilter;
+    }
+    
+    private UserAuthFilter userAuthFilter( String url, String httpMethod ) { 
+        var matcher =  requestMatcher( url, httpMethod );
+        var userFilter =  new UserAuthFilter( matcher, authenticationManager() );
+        userFilter.setAuthenticationFailureHandler( authFailHandler() );
+
+        return userFilter;
+    }
+    
+    public AuthenticationFailureHandler authFailHandler() {
+
+        Map<String, String> failures = new HashMap<>();
+        failures.put( BadCredentialsException.class.getName(), "/unauthorized");
+        failures.put( UsernameNotFoundException.class.getName(), "/unauthorized" );
+
+        var handler = new ExceptionMappingAuthenticationFailureHandler();
+        handler.setExceptionMappings( failures );
+
+        return handler;
     }
 }
