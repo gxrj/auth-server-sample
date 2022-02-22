@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LoginController {
 
     @RequestMapping( path = "/login" )
-    public String getForm(){
-        return "login";
-    }
+    public String getForm(){ return "login"; }
 
     @GetMapping( path = "/agent/login" )
-    public String getAgentForm(){
-        return "login-agent";
-    }
+    public String getAgentForm(){ return "login-agent"; }
+        
+    @GetMapping( path = "/error" )
+    public String getErrorPage() { return "error"; }  
 
+    @GetMapping( path = "/unauthorized" )
+    public String getUnauthorizedPage() { return "unauthorized"; }
 }
